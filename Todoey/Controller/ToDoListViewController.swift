@@ -7,10 +7,20 @@
 //
 
 import UIKit
+import CoreData
 
 class ToDoListViewController: UITableViewController {
 
     var itemArray = [Item]()
+    
+    var selectedCategory : Category? {
+        didSet {
+            loadItems()  // didSet is called only when selectedCategory has a value (when category tapped in other vc)
+        }
+    }
+    
+    //initialize core data
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     // User defaults method (not used in the end...)
     //let defaults = UserDefaults.standard
@@ -21,18 +31,18 @@ class ToDoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(dataFilePath)
-        let newItem = Item()
-        newItem.title = "Find Mike"
-        itemArray.append(newItem)
-        
-        let newItem2 = Item()
-        newItem2.title = "Eat Food"
-        itemArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem3.title = "Go home"
-        itemArray.append(newItem3)
+        print("data file path = \(dataFilePath)")
+//        let newItem = Item()
+//        newItem.title = "Find Mike"
+//        itemArray.append(newItem)
+//
+//        let newItem2 = Item()
+//        newItem2.title = "Eat Food"
+//        itemArray.append(newItem2)
+//
+//        let newItem3 = Item()
+//        newItem3.title = "Go home"
+//        itemArray.append(newItem3)
 
         
         //Check that data exists in user defaults, if so, populate the array
@@ -40,14 +50,7 @@ class ToDoListViewController: UITableViewController {
 //            itemArray = items
 //        }
         
-        let encoder = PropertyListEncoder()
-        
-        do {
-            let data = try encoder.encode(itemArray)
-            try data.write(to: self.dataFilePath!)
-        } catch {
-            print("Error encoding item array, \(error)")
-        }
+        loadItems()
 
 
 
@@ -85,6 +88,12 @@ class ToDoListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //print(itemArray[indexPath.row])
+        
+        // Core Data Delete method:
+//        context.delete(itemArray[indexPath.row])
+//        itemArray.remove(at: indexPath.row)
+        //then save context
+        
         
         //handle done property
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
@@ -126,8 +135,14 @@ class ToDoListViewController: UITableViewController {
             
             //print(textField.text)
             
-            let newItem = Item()
+
+            
+            let newItem = Item(context: self.context)
             newItem.title = textField.text!
+            newItem.done = false
+            
+            // Once a relationship has been established in DataModel
+            newItem.parentCategory = self.selectedCategory 
             
             //append item to list array
             self.itemArray.append(newItem)
@@ -161,32 +176,135 @@ class ToDoListViewController: UITableViewController {
     
     //encode
     func saveItems() {
-        let encoder = PropertyListEncoder()
+        // NSCoder
+        //let encoder = PropertyListEncoder()
         
+        // Core Data
         do {
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFilePath!)
+            try context.save()
         } catch {
-            print("Error encoding item array, \(error)")
+            print("Error saving context, \(error)")
         }
         
         tableView.reloadData()
     }
     
     //decode
-    func loadItems() {
+    
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
         
-        do{
-            //if there is a plist there, then create a decoder and decode the file
-            if let data = try? Data(contentsOf: dataFilePath!) {
-                let decoder = PropertyListDecoder()
-                do {
-                    itemArray = try decoder.decode([Item].self, from: data)
-                } catch {
-                    print("Error decoding array, \(error)")
-                }
+        //Only use the search predicate if it is NOT nil
+        if let additionalPredicate = predicate {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+            
+            } else {
+                request.predicate = categoryPredicate
             }
+        
+        
+        //below only works if predicate is never nil.  Use the safe unwrapping version above
+        //create a compound predicate to handle both search and category request queries
+//        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, predicate])
+//
+//        request.predicate = compoundPredicate
+        
+        do {
+            itemArray = try context.fetch(request)
+        } catch {
+            print("Error fetching context, \(error)")
+        }
+        
+        tableView.reloadData()
+        
+    }
+    
+    // before adding categoryVC
+//    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+//        do {
+//            itemArray = try context.fetch(request)
+//        } catch {
+//            print("Error fetching context, \(error)")
+//        }
+//
+//        tableView.reloadData()
+//    }
+    
+    
+//    func loadItems() {
+//
+//        // Core Data
+//        let request : NSFetchRequest<Item> = Item.fetchRequest()
+//        do {
+//            itemArray = try context.fetch(request)
+//        } catch {
+//            print("Error fetching context, \(error)")
+//        }
+//
+//        // NSCODER
+////        do{
+////            //if there is a plist there, then create a decoder and decode the file
+////            if let data = try? Data(contentsOf: dataFilePath!) {
+////                let decoder = PropertyListDecoder()
+////                do {
+////                    itemArray = try decoder.decode([Item].self, from: data)
+////                } catch {
+////                    print("Error decoding array, \(error)")
+////                }
+////            }
+////        }
+//    }
+//
+
+    
+}
+
+//MARK: Search Bar Delegate
+extension ToDoListViewController: UISearchBarDelegate {
+    //Search Bar delgate methods
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        //make a request
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        //check search bar
+        //print(searchBar.text!)
+        
+        //make a predicate
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+        request.predicate = predicate
+        
+        // decide how to sort the response
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        
+        request.sortDescriptors = [sortDescriptor]
+        
+        
+        // fetch the request
+        loadItems(with: request)
+        
+//      THis was the ugly code...
+//        do {
+//            itemArray = try context.fetch(request)
+//        } catch {
+//            print("Error fetching context, \(error)")
+//        }
+//
+//        // reload data
+//        tableView.reloadData()
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            
+            // on the main thread,
+            DispatchQueue.main.async {
+                //get rid of keyboard and cursor
+                searchBar.resignFirstResponder()
+            }
+            
         }
     }
 }
-
