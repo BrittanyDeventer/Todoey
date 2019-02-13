@@ -19,7 +19,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         //File path to this apps library
-        //print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
+        print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
+        
+        /* REALM */
+        
+        //file location
+//        print(Realm.Configuration.defaultConfiguration.fileURL)
+//
+//        let data = Data()
+//        data.name = "Angela"
+//        data.age = 21
+        
+        do {
+            let realm = try Realm()
+//            try realm.write {
+//                realm.add(data)
+//            }
+        } catch {
+            print("Error initializing new realm, \(error)")
+        }
         
         return true
     }

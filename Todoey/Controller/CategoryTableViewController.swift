@@ -7,12 +7,14 @@
 //
 
 import UIKit
-import CoreData
-
+import RealmSwift
+ 
 class CategoryTableViewController: UITableViewController {
     
-    //declare category array - an array of categories  *** this type was created in our dataModel!
-    var categories = [Category]()
+    //Create a new realm
+    let realm = try! Realm()   //valid via RealmSwift documentation, dont worry about the !
+    
+    var categories: Results<Category>?
     
     // Reference the context
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -20,14 +22,6 @@ class CategoryTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Create default/first category
-        let newCategory = Category(context: context)
-        newCategory.name = "Default"
-        //newCategory.items = // set which item is related to this category
-        
-        // Show category in tableview
-        categories.append(newCategory)
         
         // load categories to tableview
         loadCategories()
@@ -37,18 +31,15 @@ class CategoryTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // return the number of rows
-        return categories.count
-    }
+        return categories?.count ?? 1 //if categories is nil, return 1  Nil coalescing operator
+     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
 
         // Configure the cell...
-        let category = categories[indexPath.row].name
-        
-        // populate cell
-        cell.textLabel?.text = category
+        cell.textLabel?.text = categories?[indexPath.row].name ?? "No categories added yet."
 
         return cell
     }
@@ -60,22 +51,22 @@ class CategoryTableViewController: UITableViewController {
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // tell the todo list vc which item list to use
-        
         let destinationVC = segue.destination as! ToDoListViewController
         
         if let indexPath = tableView.indexPathForSelectedRow {
-            destinationVC.selectedCategory = categories[indexPath.row]
+            destinationVC.selectedCategory = categories?[indexPath.row]
         }
     }
     
     //MARK: - Data (or Model) Manipulation Methods
         //so we can use CRUD...
     //encode
-    func saveCategories() {
-     
-        // Core Data
+    func save(category: Category) {
+        // Realm
         do {
-            try context.save()
+            try realm.write {
+                realm.add(category)
+            }
         } catch {
             print("Error saving context, \(error)")
         }
@@ -85,12 +76,8 @@ class CategoryTableViewController: UITableViewController {
     
     //decode
     
-    func loadCategories(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
-        do {
-            categories = try context.fetch(request)
-        } catch {
-            print("Error fetching context, \(error)")
-        }
+    func loadCategories() {
+        categories = realm.objects(Category.self)
         
         tableView.reloadData()
     }
@@ -104,14 +91,11 @@ class CategoryTableViewController: UITableViewController {
         let alert = UIAlertController(title: "Add New Category", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add", style: .default) { (action) in
             // create category
-            let newCategory = Category(context: self.context)
+            let newCategory = Category()
             newCategory.name = textField.text!
             
-            // add category to local context
-            self.categories.append(newCategory)
-            
-            // save the context
-            self.saveCategories()
+            // save the category to realm
+            self.save(category: newCategory)
             
         }
         

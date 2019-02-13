@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9227B19321ED855E005A5647 /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 9227B19121ED855E005A5647 /* DataModel.xcdatamodeld */; };
+		9201D1BC22139D560061D2BE /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9201D1BB22139D560061D2BE /* Item.swift */; };
+		9201D1BE22139D610061D2BE /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9201D1BD22139D610061D2BE /* Category.swift */; };
 		9280E46D21F7BFBB005F041B /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9280E46C21F7BFBB005F041B /* CategoryTableViewController.swift */; };
 		929B602D21E968D600464D8D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929B602C21E968D600464D8D /* AppDelegate.swift */; };
 		929B602F21E968D600464D8D /* ToDoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929B602E21E968D600464D8D /* ToDoListViewController.swift */; };
@@ -20,7 +21,8 @@
 /* Begin PBXFileReference section */
 		7063FC8321B08D576DA4FFB8 /* Pods_Todoey.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Todoey.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		82CC53DD81ECA5BAB9485E57 /* Pods-Todoey.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Todoey.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Todoey/Pods-Todoey.debug.xcconfig"; sourceTree = "<group>"; };
-		9227B19221ED855E005A5647 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		9201D1BB22139D560061D2BE /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		9201D1BD22139D610061D2BE /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		9280E46C21F7BFBB005F041B /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		929B602921E968D600464D8D /* Todoey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Todoey.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		929B602C21E968D600464D8D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -95,7 +97,8 @@
 		92FA973F21ECEB7D003306AA /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				9227B19121ED855E005A5647 /* DataModel.xcdatamodeld */,
+				9201D1BD22139D610061D2BE /* Category.swift */,
+				9201D1BB22139D560061D2BE /* Item.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -240,10 +243,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9201D1BC22139D560061D2BE /* Item.swift in Sources */,
 				929B602F21E968D600464D8D /* ToDoListViewController.swift in Sources */,
-				9227B19321ED855E005A5647 /* DataModel.xcdatamodeld in Sources */,
 				929B602D21E968D600464D8D /* AppDelegate.swift in Sources */,
 				9280E46D21F7BFBB005F041B /* CategoryTableViewController.swift in Sources */,
+				9201D1BE22139D610061D2BE /* Category.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -443,19 +447,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		9227B19121ED855E005A5647 /* DataModel.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				9227B19221ED855E005A5647 /* DataModel.xcdatamodel */,
-			);
-			currentVersion = 9227B19221ED855E005A5647 /* DataModel.xcdatamodel */;
-			path = DataModel.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = 929B602121E968D500464D8D /* Project object */;
 }
