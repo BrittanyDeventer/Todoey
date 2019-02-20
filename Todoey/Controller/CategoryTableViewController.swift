@@ -15,11 +15,7 @@ class CategoryTableViewController: UITableViewController {
     let realm = try! Realm()   //valid via RealmSwift documentation, dont worry about the !
     
     var categories: Results<Category>?
-    
-    // Reference the context
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
       
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -59,10 +55,7 @@ class CategoryTableViewController: UITableViewController {
     }
     
     //MARK: - Data (or Model) Manipulation Methods
-        //so we can use CRUD...
-    //encode
     func save(category: Category) {
-        // Realm
         do {
             try realm.write {
                 realm.add(category)
@@ -74,11 +67,8 @@ class CategoryTableViewController: UITableViewController {
         tableView.reloadData()
     }
     
-    //decode
-    
     func loadCategories() {
         categories = realm.objects(Category.self)
-        
         tableView.reloadData()
     }
     

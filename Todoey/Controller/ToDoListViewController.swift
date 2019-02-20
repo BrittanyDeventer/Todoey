@@ -25,9 +25,6 @@ class ToDoListViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        print("data file path = \(dataFilePath)")
-        print(Realm.Configuration.defaultConfiguration.fileURL)
     }
 
     
@@ -67,11 +64,6 @@ class ToDoListViewController: UITableViewController {
         // handle done
         if let item = todoItems?[indexPath.row] {  //check that todoItems isn't nil > if not, go to indexPath.row and...
             do{
-                //if you wanted to delete them permanently
-                /*
-                 try realm.write{ realm.delete(item) }
-                 
-                 */
                 try realm.write {
                     item.done = !item.done
                 }
@@ -129,14 +121,9 @@ class ToDoListViewController: UITableViewController {
     }
     
     //MARK: Model Manipulation Methods
-    
-
-    
-    //decode
     func loadItems() {
         
         todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
-        
         tableView.reloadData()
     }
     
@@ -151,30 +138,6 @@ extension ToDoListViewController: UISearchBarDelegate {
     
         tableView.reloadData()
     }
-
-//        //make a request
-//        let request : NSFetchRequest<Item> = Item.fetchRequest()
-//
-//        //check search bar
-//        //print(searchBar.text!)
-//
-//        //make a predicate
-//        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-//
-//        request.predicate = predicate
-//
-//        // decide how to sort the response
-//        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
-//
-//        request.sortDescriptors = [sortDescriptor]
-//
-//
-//        // fetch the request
-//        loadItems(with: request)
-
-//        // reload data
-//        tableView.reloadData()
-    
 
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchBar.text?.count == 0 {
