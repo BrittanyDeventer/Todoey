@@ -67,6 +67,11 @@ class ToDoListViewController: UITableViewController {
         // handle done
         if let item = todoItems?[indexPath.row] {  //check that todoItems isn't nil > if not, go to indexPath.row and...
             do{
+                //if you wanted to delete them permanently
+                /*
+                 try realm.write{ realm.delete(item) }
+                 
+                 */
                 try realm.write {
                     item.done = !item.done
                 }
@@ -99,6 +104,7 @@ class ToDoListViewController: UITableViewController {
                         // create item
                         let newItem = Item()
                         newItem.title = textField.text!
+                        newItem.dateCreated = Date()
                         currentCategory.items.append(newItem)
                     }
                 } catch {
@@ -137,10 +143,15 @@ class ToDoListViewController: UITableViewController {
 }
 
 //MARK: Search Bar Delegate
-//extension ToDoListViewController: UISearchBarDelegate {
-//    //Search Bar delgate methods
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//
+extension ToDoListViewController: UISearchBarDelegate {
+    //Search Bar delgate methods
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+    
+        tableView.reloadData()
+    }
+
 //        //make a request
 //        let request : NSFetchRequest<Item> = Item.fetchRequest()
 //
@@ -160,28 +171,21 @@ class ToDoListViewController: UITableViewController {
 //
 //        // fetch the request
 //        loadItems(with: request)
-//
-////      THis was the ugly code...
-////        do {
-////            itemArray = try context.fetch(request)
-////        } catch {
-////            print("Error fetching context, \(error)")
-////        }
-////
-////        // reload data
-////        tableView.reloadData()
-//    }
-//
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        if searchBar.text?.count == 0 {
-//            loadItems()
-//
-//            // on the main thread,
-//            DispatchQueue.main.async {
-//                //get rid of keyboard and cursor
-//                searchBar.resignFirstResponder()
-//            }
-//
-//        }
-//    }
-//}
+
+//        // reload data
+//        tableView.reloadData()
+    
+
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+
+            // on the main thread,
+            DispatchQueue.main.async {
+                //get rid of keyboard and cursor
+                searchBar.resignFirstResponder()
+            }
+
+        }
+    }
+}
