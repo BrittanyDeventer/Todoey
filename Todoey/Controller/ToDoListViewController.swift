@@ -27,6 +27,7 @@ class ToDoListViewController: UITableViewController {
         super.viewDidLoad()
         
         print("data file path = \(dataFilePath)")
+        print(Realm.Configuration.defaultConfiguration.fileURL)
     }
 
     
@@ -64,7 +65,7 @@ class ToDoListViewController: UITableViewController {
         //print(itemArray[indexPath.row])
     
         // handle done
-        if let item = todoItems?[indexPath.row] {
+        if let item = todoItems?[indexPath.row] {  //check that todoItems isn't nil > if not, go to indexPath.row and...
             do{
                 try realm.write {
                     item.done = !item.done
@@ -77,6 +78,7 @@ class ToDoListViewController: UITableViewController {
         //make animation for pressing row (flashes grey when pressed and goes away)
         tableView.deselectRow(at: indexPath, animated: true)
         
+        tableView.reloadData()
         
     }
     
